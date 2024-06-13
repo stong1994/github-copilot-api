@@ -2,15 +2,17 @@
 
 This repository provides an API for GitHub Copilot.
 
-## Example
+## Getting Started
 
-Here's an example of how to use the API:
+To use the API, follow the example below:
 
 ```go
 package main
 
 import (
+	"context"
 	"fmt"
+
 	copilot "github.com/stong1994/github-copilot-api"
 )
 
@@ -19,25 +21,31 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	prompt := "you are a great developer!"
-	request := "give me a code to print hello world with golang"
-	opts := copilot.CompletionOpts{
-		Model:       "gpt-4",
-		N:           1,
-		TopP:        1,
-		Stream:      false,
-		Temperature: 0.1,
-	}
-
-	response, err := client.Complete(prompt, request, opts)
+	response, err := client.CreateCompletion(context.Background(), &copilot.CompletionRequest{
+		Messages: []copilot.Message{
+			{
+				Role:    "system",
+				Content: "you are a great developer!",
+			},
+			{
+				Role:    "user",
+				Content: "give me a code to print hello world with golang",
+			},
+		},
+		StreamingFunc: func(ctx context.Context, chunk []byte) error {
+			fmt.Print(string(chunk))
+			return nil
+		},
+	})
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(response.Choices[0].Message.Content)
+	// you can get the content directly
+	// fmt.Println(response.Choices[0].Message.Content)
 }
 ```
+
+## Running the Example
 
 To run the example, use the following command:
 
@@ -45,11 +53,11 @@ To run the example, use the following command:
 go run main.go
 ```
 
+## Expected Output
+
 The output will be similar to this:
 
 ```
-Sure, here is a simple "Hello, World!" program in Go:
-
 package main
 
 import "fmt"
@@ -57,11 +65,9 @@ import "fmt"
 func main() {
     fmt.Println("Hello, World!")
 }
-```
 
-This program will print "Hello, World!" to the console.
+This program first imports the `fmt` package, which contains functions for formatting text, including printing to the console. Then it defines a `main` function. When the program runs, it starts by executing this function. The `main` function uses `fmt.Println` to print "Hello, World!" to the console.
 
 ```
 
 This example demonstrates how to use the GitHub Copilot API to generate a simple "Hello, World!" program in Go.
-```
