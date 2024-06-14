@@ -119,3 +119,31 @@ go run main.go
 0: {[-0.0026773715 -0.0018009724 0.010035048 ...]}
 1: {[-0.0312465 -0.0329363 0.020233147 ...]}
 ```
+
+## Device
+
+You can get the github copilot token with device auth.
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	copilot "github.com/stong1994/github-copilot-api"
+)
+
+func main() {
+	token, err := copilot.DeviceLogin(context.TODO(), os.Getenv("GITHUB_CLIENT_ID"))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("GITHUB_OAUTH_TOKEN is %s, you can set it into environment: export GITHUB_OATUH_TOKEN=%s", token, token)
+}
+```
+
+To get the GITHUB_CLIENT_ID, you can follow [this blog](https://support.heateor.com/get-github-client-id-client-secret/).

@@ -15,9 +15,9 @@ func WithBaseURL(baseURL string) Option {
 	}
 }
 
-func WithGithubToken(githubtoken string) Option {
+func WithGithubOAuthToken(githubOAuthToken string) Option {
 	return func(c *Copilot) {
-		c.githubToken = githubtoken
+		c.githubOAuthToken = githubOAuthToken
 	}
 }
 

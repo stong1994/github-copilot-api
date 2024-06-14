@@ -18,11 +18,11 @@ type Doer interface {
 }
 
 type Copilot struct {
-	githubToken string
-	token       Token
-	sessionID   string
-	machineID   string
-	userAgent   string
+	githubOAuthToken string
+	copilotToken     Token
+	sessionID        string
+	machineID        string
+	userAgent        string
 
 	model      string
 	baseURL    string
@@ -34,15 +34,15 @@ func NewCopilot(opts ...Option) (*Copilot, error) {
 	for _, opt := range opts {
 		opt(c)
 	}
-	if c.githubToken == "" {
-		c.githubToken = getCacheToken()
+	if c.githubOAuthToken == "" {
+		c.githubOAuthToken = getOAuthTokenInLocal()
 	}
 	err := c.withAuth()
 	return c, err
 }
 
 func (c *Copilot) setHeaders(req *http.Request) {
-	req.Header = generateHeaders(c.token.Token, c.sessionID, c.machineID)
+	req.Header = generateHeaders(c.copilotToken.Token, c.sessionID, c.machineID)
 }
 
 // TODO: set with option

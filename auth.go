@@ -1,10 +1,8 @@
 package githubcopilotapi
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -21,11 +19,11 @@ type Token struct {
 }
 
 func (c *Copilot) withAuth() error {
-	if c.githubToken == "" {
+	if c.githubOAuthToken == "" {
 		return errors.New("no GitHub token found")
 	}
 
-	if c.token.Token == "" || (c.token.ExpiresAt <= time.Now().Unix()) {
+	if c.copilotToken.Token == "" || (c.copilotToken.ExpiresAt <= time.Now().Unix()) {
 		sessionID := uuid.NewString() + strconv.Itoa(int(time.Now().UnixNano()/1000))
 
 		url := "https://api.github.com/copilot_internal/v2/token"
@@ -34,7 +32,7 @@ func (c *Copilot) withAuth() error {
 			return err
 		}
 
-		req.Header.Set("Authorization", "token "+c.githubToken)
+		req.Header.Set("Authorization", "token "+c.githubOAuthToken)
 		req.Header.Set("Accept", "application/json")
 
 		resp, err := http.DefaultClient.Do(req)
@@ -58,7 +56,7 @@ func (c *Copilot) withAuth() error {
 			return err
 		}
 
-		c.token = token
+		c.copilotToken = token
 		c.sessionID = sessionID
 
 	}
@@ -70,7 +68,7 @@ type UserData struct {
 	OAuthToken string `json:"oauth_token"`
 }
 
-func getCacheToken() string {
+func getOAuthTokenInLocal() string {
 	// loading token from the environment only in GitHub Codespaces
 	token := os.Getenv("GITHUB_TOKEN")
 	codespaces := os.Getenv("CODESPACES")
@@ -109,89 +107,6 @@ func getCacheToken() string {
 	}
 
 	return ""
-}
-
-type EmbedInput struct {
-	Filename string `json:"filename"`
-	Filetype string `json:"filetype"`
-	Prompt   string `json:"prompt,omitempty"`
-	Content  string `json:"content,omitempty"`
-}
-
-type EmbedOpts struct {
-	Model     string
-	ChunkSize int
-	OnDone    func([]EmbedInput)
-	OnError   func(string)
-}
-
-func (c *Copilot) Embed(inputs []EmbedInput, opts EmbedOpts) {
-	if len(inputs) == 0 {
-		if opts.OnDone != nil {
-			opts.OnDone([]EmbedInput{})
-		}
-		return
-	}
-
-	url := fmt.Sprintf("%s/embeddings", c.baseURL)
-
-	chunks := make([][]EmbedInput, 0)
-	for i := 0; i < len(inputs); i += opts.ChunkSize {
-		end := i + opts.ChunkSize
-		if end > len(inputs) {
-			end = len(inputs)
-		}
-		chunks = append(chunks, inputs[i:end])
-	}
-
-	for _, chunk := range chunks {
-		body, err := json.Marshal(chunk)
-		if err != nil {
-			if opts.OnError != nil {
-				opts.OnError("Failed to encode request body: " + err.Error())
-			}
-			return
-		}
-
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
-		if err != nil {
-			if opts.OnError != nil {
-				opts.OnError("Failed to create request: " + err.Error())
-			}
-			return
-		}
-
-		req.Header = generateHeaders(c.token.Token, c.sessionID, c.machineID)
-
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			if opts.OnError != nil {
-				opts.OnError("Failed to make request: " + err.Error())
-			}
-			return
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			if opts.OnError != nil {
-				opts.OnError("Failed to get response: " + resp.Status)
-			}
-			return
-		}
-
-		var result []EmbedInput
-		err = json.NewDecoder(resp.Body).Decode(&result)
-		if err != nil {
-			if opts.OnError != nil {
-				opts.OnError("Failed to decode response: " + err.Error())
-			}
-			return
-		}
-
-		if opts.OnDone != nil {
-			opts.OnDone(result)
-		}
-	}
 }
 
 func findConfigPath() string {
