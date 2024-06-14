@@ -34,7 +34,7 @@ func DeviceLogin(ctx context.Context, clientID string) (string, error) {
 	if input != "y" && input != "Y" {
 		return "", fmt.Errorf("aborted")
 	}
-	fmt.Println("Waiting for authentication...")
+	fmt.Println("Authenticating, please wait...")
 
 	token, err := config.DeviceAccessToken(ctx, resp)
 	if err != nil {

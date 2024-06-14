@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	copilot "github.com/stong1994/github-copilot-api"
 )
 
 func main() {
-	token, err := copilot.DeviceLogin(context.TODO(), "Iv23lisucfy8lSS2j0sn")
+	token, err := copilot.DeviceLogin(context.TODO(), os.Getenv("GITHUB_CLIENT_ID"))
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(token)
+	fmt.Printf("GITHUB_OAUTH_TOKEN is %s, you can set it into environment: export GITHUB_OATUH_TOKEN=%s", token, token)
 }
