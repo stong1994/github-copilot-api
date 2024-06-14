@@ -133,20 +133,8 @@ func (c *Copilot) setCompletionDefaults(payload *CompletionRequest) {
 	if payload.Temperature == 0 {
 		payload.Temperature = 0.1
 	}
-
-	switch {
-	// Prefer the model specified in the payload.
-	case payload.Model != "":
-
-	// If no model is set in the payload, take the one specified in the client.
-	case c.model != "":
-		payload.Model = c.model
-	// Fallback: use the default model
-	default:
-		payload.Model = defaultCompletionModel
-	}
-	if c.httpClient == nil {
-		c.httpClient = http.DefaultClient
+	if payload.Model == "" {
+		payload.Model = c.completionModel
 	}
 }
 
@@ -167,9 +155,6 @@ func (c *Copilot) CreateCompletion(ctx context.Context, payload *CompletionReque
 
 	// Build request
 	body := bytes.NewReader(payloadBytes)
-	if c.baseURL == "" {
-		c.baseURL = defaultBaseURL
-	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/chat/completions", c.baseURL), body)
 	if err != nil {
 		return nil, err

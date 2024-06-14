@@ -25,15 +25,8 @@ type EmbeddingResponse struct {
 }
 
 func (c *Copilot) setEmbeddingDefaults(payload *EmbeddingRequest) {
-	switch {
-	case payload.Model != "":
-	case c.model != "":
-		payload.Model = c.model
-	default:
-		payload.Model = defaultEmbeddingModel
-	}
-	if c.httpClient == nil {
-		c.httpClient = http.DefaultClient
+	if payload.Model == "" {
+		payload.Model = c.embeddingModel
 	}
 }
 
@@ -50,9 +43,6 @@ func (c *Copilot) CreateEmbedding(ctx context.Context, payload *EmbeddingRequest
 
 	// Build request
 	body := bytes.NewReader(payloadBytes)
-	if c.baseURL == "" {
-		c.baseURL = defaultBaseURL
-	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/embeddings", c.baseURL), body)
 	if err != nil {
 		return nil, err
