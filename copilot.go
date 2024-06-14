@@ -46,6 +46,7 @@ func NewCopilot(opts ...Option) (*Copilot, error) {
 	for _, opt := range opts {
 		opt(c)
 	}
+	c.setDefault()
 	err := c.withAuth()
 	return c, err
 }
