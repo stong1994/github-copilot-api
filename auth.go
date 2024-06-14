@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -132,7 +133,7 @@ func (c *Copilot) Embed(inputs []EmbedInput, opts EmbedOpts) {
 		return
 	}
 
-	url := "https://api.githubcopilot.com/embeddings"
+	url := fmt.Sprintf("%s/embeddings", c.baseURL)
 
 	chunks := make([][]EmbedInput, 0)
 	for i := 0; i < len(inputs); i += opts.ChunkSize {

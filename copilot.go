@@ -8,6 +8,7 @@ import (
 
 const (
 	defaultCompletionModel = "gpt-4"
+	defaultEmbeddingModel  = "copilot-text-embedding-ada-002"
 	defaultBaseURL         = "https://api.githubcopilot.com"
 )
 

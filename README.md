@@ -2,9 +2,9 @@
 
 This repository provides an API for GitHub Copilot.
 
-## Getting Started
+## Completion
 
-To use the API, follow the example below:
+### Example
 
 ```go
 package main
@@ -45,7 +45,7 @@ func main() {
 }
 ```
 
-## Running the Example
+### Running the Example
 
 To run the example, use the following command:
 
@@ -53,7 +53,7 @@ To run the example, use the following command:
 go run main.go
 ```
 
-## Expected Output
+### Expected Output
 
 The output will be similar to this:
 
@@ -71,3 +71,51 @@ This program first imports the `fmt` package, which contains functions for forma
 ```
 
 This example demonstrates how to use the GitHub Copilot API to generate a simple "Hello, World!" program in Go.
+
+## Embedding
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	copilot "github.com/stong1994/github-copilot-api"
+)
+
+func main() {
+	client, err := copilot.NewCopilot()
+	if err != nil {
+		panic(err)
+	}
+	response, err := client.CreateEmbedding(context.Background(), &copilot.EmbeddingRequest{
+		Model: "copilot-text-embedding-ada-002",
+		Input: []string{
+			"you are a great developer!",
+			"thanks for your help",
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	for i, embedding := range response.Data {
+		fmt.Printf("%d: %v\n", i, embedding)
+	}
+}
+```
+
+### Run
+
+```bash
+go run main.go
+```
+
+### Expected Output
+
+```bash
+0: {[-0.0026773715 -0.0018009724 0.010035048 ...]}
+1: {[-0.0312465 -0.0329363 0.020233147 ...]}
+```
