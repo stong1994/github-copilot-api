@@ -15,6 +15,7 @@ const (
 	defaultOpenAIIntent         = "conversation-panel"
 	defaultUserAgent            = "github.com/stong1994/github-copilot-api/1.0.0"
 	defaultClientVersion        = "1.0.0"
+	defaultTemperature          = 1.0
 )
 
 // Doer performs a HTTP request.
@@ -36,6 +37,7 @@ type Copilot struct {
 	openaiOrganization   string
 	openaiIntent         string
 	clientVersion        string
+	temperature          float64
 
 	baseURL    string
 	httpClient Doer
@@ -81,6 +83,9 @@ func (c *Copilot) setDefault() {
 	}
 	if c.clientVersion == "" {
 		c.clientVersion = defaultClientVersion
+	}
+	if c.temperature == 0 {
+		c.temperature = defaultTemperature
 	}
 }
 

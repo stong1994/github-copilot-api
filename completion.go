@@ -131,7 +131,7 @@ func (c *Copilot) setCompletionDefaults(payload *CompletionRequest) {
 		payload.TopP = 1
 	}
 	if payload.Temperature == 0 {
-		payload.Temperature = 0.1
+		payload.Temperature = c.temperature
 	}
 	if payload.Model == "" {
 		payload.Model = c.completionModel

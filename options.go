@@ -27,6 +27,12 @@ func WithGithubOAuthToken(githubOAuthToken string) Option {
 	}
 }
 
+func WithTemperature(temperature float64) Option {
+	return func(c *Copilot) {
+		c.temperature = temperature
+	}
+}
+
 func WithHTTPCopilot(httpclient Doer) Option {
 	return func(c *Copilot) {
 		c.httpClient = httpclient
