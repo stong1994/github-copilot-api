@@ -34,6 +34,7 @@ func (c *Copilot) withAuth() error {
 
 		req.Header.Set("Authorization", "token "+c.githubOAuthToken)
 		req.Header.Set("Accept", "application/json")
+		req.Header.Set("User-Agent", c.userAgent)
 
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
